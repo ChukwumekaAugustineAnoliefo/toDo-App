@@ -31,35 +31,35 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
               height: 10,
             ),
             ElevatedButton(
-                onPressed: () async {
-                  String taskName = taskController.text.trim();
+              onPressed: () async {
+                String taskName = taskController.text.trim();
 
-                  if (taskName.isEmpty) {
-                    Fluttertoast.showToast(msg: 'Please provide task name');
-                    return;
-                  }
+                if (taskName.isEmpty) {
+                  Fluttertoast.showToast(msg: 'Please provide task name');
+                  return;
+                }
 
-                  User? user = FirebaseAuth.instance.currentUser;
+                User? user = FirebaseAuth.instance.currentUser;
 
-                  if (user != null) {
-                    String uid = user.uid;
-                    int dt = DateTime.now().millisecondsSinceEpoch;
+                if (user != null) {
+                  String uid = user.uid;
+                  int dt = DateTime.now().millisecondsSinceEpoch;
 
-                    DatabaseReference taskRef = FirebaseDatabase.instance
-                        .ref()
-                        .child('tasks')
-                        .child(uid);
+                  DatabaseReference taskRef =
+                      FirebaseDatabase.instance.ref().child('tasks').child(uid);
 
-                    String taskId = taskRef.push().key ?? '';
+                  String taskId = taskRef.push().key ?? '';
 
-                    await taskRef.child(taskId).set({
-                      'dt': dt,
-                      'taskName': taskName,
-                      'taskId': taskId,
-                    });
-                  }
-                },
-                child: const Text('Save')),
+                  await taskRef.child(taskId).set({
+                    'dt': dt,
+                    'taskName': taskName,
+                    'taskId': taskId,
+                  });
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('Save'),
+            ),
           ],
         ),
       ),

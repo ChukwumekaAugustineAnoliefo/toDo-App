@@ -5,7 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-
+import 'package:firebase_core/firebase_core.dart';
 import 'package:ndialog/ndialog.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -42,10 +42,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   _getUserDetails() async {
-    DataSnapshot snapshot = await userRef!.once() as DataSnapshot;
+    DatabaseEvent event = await userRef!.once();
 
-    userModel =
-        UserModel.fromMap(Map<String, dynamic>.from(snapshot.value as dynamic));
+    userModel = UserModel.fromMap(
+        Map<String, dynamic>.from(event.snapshot.value as dynamic));
 
     setState(() {});
   }
@@ -83,7 +83,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       String profileImageUrl = await snapshot.ref.getDownloadURL();
 
       print(profileImageUrl);
+      DatabaseReference userRef =
+          FirebaseDatabase.instance.ref().child('users').child(user!.uid);
 
+      await userRef.update({
+        'profileImage': profileImageUrl,
+      });
       progressDialog.dismiss();
     } catch (e) {
       progressDialog.dismiss();
@@ -102,6 +107,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
     imageFile = tempImage;
     showLocalFile = true;
     setState(() {});
+    ProgressDialog progressDialog = ProgressDialog(
+      context,
+      title: const Text('Uploading !!!'),
+      message: const Text('Please wait'),
+    );
+    progressDialog.show();
+    try {
+      var fileName = userModel!.email + '.jpg';
+
+      UploadTask uploadTask = FirebaseStorage.instance
+          .ref()
+          .child('profile_images')
+          .child(fileName)
+          .putFile(imageFile!);
+
+      TaskSnapshot snapshot = await uploadTask;
+
+      String profileImageUrl = await snapshot.ref.getDownloadURL();
+
+      print(profileImageUrl);
+      DatabaseReference userRef =
+          FirebaseDatabase.instance.ref().child('users').child(user!.uid);
+
+      await userRef.update({
+        'profileImage': profileImageUrl,
+      });
+      progressDialog.dismiss();
+    } catch (e) {
+      progressDialog.dismiss();
+
+      print(e.toString());
+    }
   }
 
   @override
