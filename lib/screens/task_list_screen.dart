@@ -1,11 +1,12 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_todo_app/models/task_model.dart';
 import 'package:my_todo_app/screens/add_task_screen.dart';
 import 'package:my_todo_app/screens/login_screen.dart';
 import 'package:my_todo_app/screens/profile_screen.dart';
 import 'package:my_todo_app/screens/update_task_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class TaskListScreen extends StatefulWidget {
   const TaskListScreen({Key? key}) : super(key: key);
@@ -89,7 +90,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
         stream: taskRef != null ? taskRef!.onValue : null,
         builder: (context, snapshot) {
           if (snapshot.hasData && !snapshot.hasError) {
-            var event = snapshot.data as Event;
+            var event = snapshot.data as dynamic;
 
             var snapshot2 = event.snapshot.value;
             if (snapshot2 == null) {

@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:my_todo_app/models/user_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
+
+import 'package:ndialog/ndialog.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -9,17 +17,35 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  File? imageFile;
+  bool showLocalFile = false;
   User? user;
   UserModel? userModel;
   DatabaseReference? userRef;
 
-  File? imageFile;
-  bool showLocalFile = false;
+  @override
+  void initState() {
+    super.initState();
+
+    user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      userRef = FirebaseDatabase.instance.ref().child('users').child(user!.uid);
+    }
+
+    _getUserDetails();
+  }
+
+  String getHumanReadableDate(int dt) {
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(dt);
+
+    return DateFormat('dd MMM yyyy').format(dateTime);
+  }
 
   _getUserDetails() async {
-    DataSnapshot snapshot = await userRef!.once();
+    DataSnapshot snapshot = await userRef!.once() as DataSnapshot;
 
-    userModel = UserModel.fromMap(Map<String, dynamic>.from(snapshot.value));
+    userModel =
+        UserModel.fromMap(Map<String, dynamic>.from(snapshot.value as dynamic));
 
     setState(() {});
   }
@@ -76,19 +102,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     imageFile = tempImage;
     showLocalFile = true;
     setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      userRef =
-          FirebaseDatabase.instance.reference().child('users').child(user!.uid);
-    }
-
-    _getUserDetails();
   }
 
   @override
@@ -175,11 +188,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ));
-  }
-
-  String getHumanReadableDate(int dt) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(dt);
-
-    return DateFormat('dd MMM yyyy').format(dateTime);
   }
 }

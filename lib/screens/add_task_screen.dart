@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class AddTaskScreen extends StatefulWidget {
   const AddTaskScreen({Key? key}) : super(key: key);
@@ -44,11 +46,11 @@ class _AddTaskScreenState extends State<AddTaskScreen> {
                     int dt = DateTime.now().millisecondsSinceEpoch;
 
                     DatabaseReference taskRef = FirebaseDatabase.instance
-                        .reference()
+                        .ref()
                         .child('tasks')
                         .child(uid);
 
-                    String taskId = taskRef.push().key;
+                    String taskId = taskRef.push().key ?? '';
 
                     await taskRef.child(taskId).set({
                       'dt': dt,
