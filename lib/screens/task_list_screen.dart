@@ -90,7 +90,7 @@ class _TaskListScreenState extends State<TaskListScreen> {
         stream: taskRef != null ? taskRef!.onValue : null,
         builder: (context, snapshot) {
           if (snapshot.hasData && !snapshot.hasError) {
-            var event = snapshot.data as dynamic;
+            var event = snapshot.data as DatabaseEvent;
 
             var snapshot2 = event.snapshot.value;
             if (snapshot2 == null) {
@@ -99,7 +99,8 @@ class _TaskListScreenState extends State<TaskListScreen> {
               );
             }
 
-            Map<String, dynamic> map = Map<String, dynamic>.from(snapshot2);
+            Map<String, dynamic> map =
+                Map<String, dynamic>.from(snapshot2 as dynamic);
 
             var tasks = <TaskModel>[];
 

@@ -119,7 +119,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       // store user information in Realtime database
 
                       DatabaseReference userRef =
-                          FirebaseDatabase.instance.reference().child('users');
+                          FirebaseDatabase.instance.ref().child('users');
 
                       String uid = userCredential.user!.uid;
                       int dt = DateTime.now().millisecondsSinceEpoch;
